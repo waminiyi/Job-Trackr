@@ -1,0 +1,14 @@
+const String databaseName = 'job_trackr_database';
+const String tableJobApplications = 'job_applications';
+const String columnId = '_id';
+const String columnTitle = 'title';
+const String columnEnterpriseName = 'enterprise_name';
+const String columnApplicationDate = 'application_date';
+const String columnApplicationType = 'application_type';
+const String columnStatus = 'status';
+const String columnStatusDates = 'status_dates';
+const String columnJobBoardName = 'job_board_name';
+const String columnJobPostLink = 'job_post_link';
+const String columnEnterpriseLink = 'enterprise_link';
+const String columnLocationName = 'location_name';
+const String columnNote = 'note';
