@@ -8,6 +8,12 @@ import 'package:synchronized/synchronized.dart';
 
 import '../models/constants.dart';
 import '../models/job_application.dart';
+import '../models/job_application_details.dart';
+
+JobApplicationDetails snapshotToJobApplicationDetails(
+    Map<String, Object?> snapshot) {
+  return JobApplicationDetails.fromMap(snapshot);
+}
 
 JobApplication snapshotToJobApplication(Map<String, Object?> snapshot) {
   return JobApplication.fromMap(snapshot);
@@ -23,7 +29,6 @@ class JobApplications extends ListBase<JobApplication> {
 
   @override
   JobApplication operator [](int index) {
-    print(list[index]);
     return _cacheJobApplications[index] ??=
         snapshotToJobApplication(list[index]);
   }
@@ -79,7 +84,7 @@ class JobApplicationProvider {
         return db;
       });
 
-  Future<JobApplication?> getJobApplication(int? id) async {
+  Future<JobApplicationDetails?> getJobApplication(int? id) async {
     var list = (await db!.query(
       tableJobApplications,
       columns: [
@@ -101,7 +106,7 @@ class JobApplicationProvider {
     ));
 
     if (list.isNotEmpty) {
-      return JobApplication.fromMap(list.first);
+      return JobApplicationDetails.fromMap(list.first);
     }
     return null;
   }
@@ -129,7 +134,7 @@ class JobApplicationProvider {
 
     await _saveJobApplication(
         db,
-        JobApplication(
+        JobApplicationDetails(
           title: 'Android developer',
           enterpriseName: 'Diabeloop',
           applicationDate: DateTime.now(),
@@ -139,7 +144,7 @@ class JobApplicationProvider {
         ));
     await _saveJobApplication(
         db,
-        JobApplication(
+        JobApplicationDetails(
           title: 'Mobile software developer',
           enterpriseName: 'Viseo',
           applicationDate: DateTime.now(),
@@ -157,7 +162,7 @@ class JobApplicationProvider {
   Future<String> fixPath(String path) async => path;
 
   Future _saveJobApplication(
-      DatabaseExecutor? db, JobApplication updatedApplication) async {
+      DatabaseExecutor? db, JobApplicationDetails updatedApplication) async {
     if (updatedApplication.id != null) {
       await db!.update(tableJobApplications, updatedApplication.toMap(),
           where: '$columnId = ?', whereArgs: <Object?>[updatedApplication.id]);
@@ -167,7 +172,7 @@ class JobApplicationProvider {
     }
   }
 
-  Future saveJobApplication(JobApplication updatedApplication) async {
+  Future saveJobApplication(JobApplicationDetails updatedApplication) async {
     await _saveJobApplication(db, updatedApplication);
     _triggerUpdate();
   }
@@ -183,10 +188,9 @@ class JobApplicationProvider {
     sink.add(JobApplications(snapshotList));
   });
 
-  var jobApplicationTransformer =
-      StreamTransformer<Map<String, Object?>, JobApplication?>.fromHandlers(
-          handleData: (snapshot, sink) {
-    sink.add(snapshotToJobApplication(snapshot));
+  var jobApplicationTransformer = StreamTransformer<Map<String, Object?>,
+      JobApplicationDetails?>.fromHandlers(handleData: (snapshot, sink) {
+    sink.add(snapshotToJobApplicationDetails(snapshot));
   });
 
   /// Listen for changes on any JobApplication
@@ -215,8 +219,8 @@ class JobApplicationProvider {
   }
 
   /// Listen for changes on a given JobApplication
-  Stream<JobApplication?> onJobApplication(int? id) {
-    late StreamController<JobApplication?> controller;
+  Stream<JobApplicationDetails?> onJobApplication(int? id) {
+    late StreamController<JobApplicationDetails?> controller;
     StreamSubscription? triggerSubscription;
 
     Future<void> sendUpdate() async {
@@ -226,7 +230,7 @@ class JobApplicationProvider {
       }
     }
 
-    controller = StreamController<JobApplication?>(onListen: () {
+    controller = StreamController<JobApplicationDetails?>(onListen: () {
       sendUpdate();
 
       /// Listen for trigger
@@ -248,14 +252,7 @@ class JobApplicationProvider {
           columnTitle,
           columnEnterpriseName,
           columnApplicationDate,
-          columnApplicationType,
           columnStatus,
-          columnStatusDates,
-          columnJobBoardName,
-          columnJobPostLink,
-          columnEnterpriseLink,
-          columnLocationName,
-          columnNote
         ],
         orderBy:
             '$columnEnterpriseName ${(descending ?? false) ? 'ASC' : 'DESC'}',

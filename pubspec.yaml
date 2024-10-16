@@ -4,7 +4,7 @@ description: "A new Flutter project."
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-# The following defines the version and build number for your job_application.dart.
+# The following defines the version and build number for your job_application_details.dart.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +.
 # Both the version and the builder number may be overridden in flutter
@@ -32,7 +32,7 @@ dependencies:
     sdk: flutter
 
 
-  # The following adds the Cupertino Icons font to your job_application.dart.
+  # The following adds the Cupertino Icons font to your job_application_details.dart.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   sqflite: ^2.4.0
@@ -60,11 +60,11 @@ dev_dependencies:
 flutter:
 
   # The following line ensures that the Material Icons font is
-  # included with your job_application.dart, so that you can use the icons in
+  # included with your job_application_details.dart, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
 
-  # To add assets to your job_application.dart, add an assets section, like this:
+  # To add assets to your job_application_details.dart, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
@@ -75,7 +75,7 @@ flutter:
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
 
-  # To add custom fonts to your job_application.dart, add a fonts section here,
+  # To add custom fonts to your job_application_details.dart, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For

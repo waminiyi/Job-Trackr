@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../data/models/application_status.dart';
 import '../../data/models/application_type.dart';
-import '../../data/models/job_application.dart';
+import '../../data/models/job_application_details.dart';
 import '../../main.dart';
 
 class JobApplicationForm extends StatefulWidget {
@@ -162,7 +162,7 @@ class JobApplicationFormState extends State<JobApplicationForm> {
                       _formKey.currentState!.save();
 
                       // Create a JobApplication object and insert it into the database
-                      JobApplication jobApplication = JobApplication(
+                      JobApplicationDetails jobApplication = JobApplicationDetails(
                         title: _title,
                         enterpriseName: _enterpriseName,
                         applicationDate: _applicationDate,
