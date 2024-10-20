@@ -1,0 +1,15 @@
+{
+  "appName": "Job Trackr",
+  "jobApplications": "Job Applications",
+  "titleAddJob": "Add Job Application",
+  "applicationStatus_applied": "Applied",
+  "applicationStatus_reviewed": "Reviewed",
+  "applicationStatus_hrInterviewing": "HR interviewing",
+  "applicationStatus_technicalInterviewing": "Technical interviewing",
+  "applicationStatus_technicalTest": "Technical Test",
+  "applicationStatus_accepted": "Accepted",
+  "applicationStatus_ghosting": "Ghosting",
+  "applicationStatus_rejected": "Rejected",
+  "applicationStatus_offer": "Offer"
+
+}

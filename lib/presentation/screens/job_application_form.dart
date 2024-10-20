@@ -1,37 +1,52 @@
+import 'package:drift/drift.dart' as Drift;
 import 'package:flutter/material.dart';
-import '../../data/models/application_status.dart';
-import '../../data/models/application_type.dart';
-import '../../data/models/job_application_details.dart';
-import '../../main.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:job_trackr/presentation/application_status_localization.dart';
+import '../../database/database.dart';
+import '../../database/table.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class JobApplicationForm extends StatefulWidget {
+class JobApplicationForm extends ConsumerStatefulWidget {
   const JobApplicationForm({super.key});
 
   @override
   JobApplicationFormState createState() => JobApplicationFormState();
 }
 
-class JobApplicationFormState extends State<JobApplicationForm> {
+class JobApplicationFormState extends ConsumerState<JobApplicationForm> {
   final _formKey = GlobalKey<FormState>();
 
   // Form fields
-  String _title = '';
-  String _enterpriseName = '';
+  String _role = '';
+  String _company = '';
   DateTime _applicationDate = DateTime.now();
-  ApplicationType _applicationType = ApplicationType.jobPost;
-  ApplicationStatus _status = ApplicationStatus.planned;
-  Map<ApplicationStatus, DateTime> _statusDates = {};
-  String? _jobBoardName;
-  String? _jobPostLink;
-  String? _enterpriseLink;
-  String? _locationName;
+  OpportunityType _applicationType = OpportunityType.jobPost;
+  ApplicationStatus _status = ApplicationStatus.applied;
+  String? _location;
   String? _note;
+
+  // Method to trigger date picker
+  Future<void> _pickDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _applicationDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null && picked != _applicationDate) {
+      setState(() {
+        _applicationDate = picked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Job Application'),
+        title: Text(AppLocalizations.of(context)!.titleAddJob),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -50,13 +65,13 @@ class JobApplicationFormState extends State<JobApplicationForm> {
                     return null;
                   },
                   onSaved: (value) {
-                    _title = value!;
+                    _role = value!;
                   },
                 ),
 
                 // Enterprise Name Input Field
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Enterprise Name'),
+                  decoration: InputDecoration(labelText: 'Company Name'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter the enterprise name';
@@ -64,29 +79,41 @@ class JobApplicationFormState extends State<JobApplicationForm> {
                     return null;
                   },
                   onSaved: (value) {
-                    _enterpriseName = value!;
+                    _company = value!;
                   },
                 ),
 
-                // Application Date Input Field
-                TextFormField(
-                  decoration: InputDecoration(labelText: 'Application Date'),
-                  keyboardType: TextInputType.datetime,
-                  initialValue: _applicationDate.toIso8601String().split('T').first,
-                  onSaved: (value) {
-                    _applicationDate = DateTime.parse(value!);
-                  },
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                            labelText: 'Application Date (Optional)'),
+                        readOnly: true,
+                        controller: TextEditingController(
+                          text: _applicationDate != null
+                              ? DateFormat.yMMMd().format(_applicationDate!)
+                              : 'No date chosen',
+                        ),
+                        onTap: () => _pickDate(context),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.calendar_today),
+                      onPressed: () => _pickDate(context),
+                    ),
+                  ],
                 ),
 
                 // Application Type Dropdown
-                DropdownButtonFormField<ApplicationType>(
+                DropdownButtonFormField<OpportunityType>(
                   decoration: InputDecoration(labelText: 'Application Type'),
                   value: _applicationType,
-                  items: ApplicationType.values
+                  items: OpportunityType.values
                       .map((type) => DropdownMenuItem(
-                    value: type,
-                    child: Text(type.toString().split('.').last),
-                  ))
+                            value: type,
+                            child: Text(type.toString().split('.').last),
+                          ))
                       .toList(),
                   onChanged: (value) {
                     setState(() {
@@ -101,47 +128,23 @@ class JobApplicationFormState extends State<JobApplicationForm> {
                   value: _status,
                   items: ApplicationStatus.values
                       .map((status) => DropdownMenuItem(
-                    value: status,
-                    child: Text(status.toString().split('.').last),
-                  ))
+                            value: status,
+                            child: Text(status.localized(context)),
+                          ))
                       .toList(),
                   onChanged: (value) {
                     setState(() {
                       _status = value!;
-                      _statusDates[_status] = DateTime.now(); // Automatically set status date
                     });
-                  },
-                ),
-
-                // Job Board Name (Optional)
-                TextFormField(
-                  decoration: InputDecoration(labelText: 'Job Board Name (Optional)'),
-                  onSaved: (value) {
-                    _jobBoardName = value;
-                  },
-                ),
-
-                // Job Post Link (Optional)
-                TextFormField(
-                  decoration: InputDecoration(labelText: 'Job Post Link (Optional)'),
-                  onSaved: (value) {
-                    _jobPostLink = value;
-                  },
-                ),
-
-                // Enterprise Link (Optional)
-                TextFormField(
-                  decoration: InputDecoration(labelText: 'Enterprise Link (Optional)'),
-                  onSaved: (value) {
-                    _enterpriseLink = value;
                   },
                 ),
 
                 // Location Name (Optional)
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Location Name (Optional)'),
+                  decoration:
+                      InputDecoration(labelText: 'Location Name (Optional)'),
                   onSaved: (value) {
-                    _locationName = value;
+                    _location = value;
                   },
                 ),
 
@@ -161,22 +164,18 @@ class JobApplicationFormState extends State<JobApplicationForm> {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
 
-                      // Create a JobApplication object and insert it into the database
-                      JobApplicationDetails jobApplication = JobApplicationDetails(
-                        title: _title,
-                        enterpriseName: _enterpriseName,
-                        applicationDate: _applicationDate,
-                        applicationType: _applicationType,
-                        status: _status,
-                        statusDates: _statusDates,
-                        jobBoardName: _jobBoardName,
-                        jobPostLink: _jobPostLink,
-                        enterpriseLink: _enterpriseLink,
-                        locationName: _locationName,
-                        note: _note,
-                      );
-
-                      await jobApplicationProvider.saveJobApplication(jobApplication);
+                      ref
+                          .read(AppDatabase.provider)
+                          .applicationEntries
+                          .insertOne(ApplicationEntriesCompanion.insert(
+                            role: _role,
+                            company: _company,
+                            applicationDate: Drift.Value(_applicationDate),
+                            opportunity: Drift.Value(_applicationType),
+                            status: _status,
+                            location: Drift.Value(_location),
+                            note: Drift.Value(_note),
+                          ));
 
                       // Show success message and navigate back
                       ScaffoldMessenger.of(context).showSnackBar(

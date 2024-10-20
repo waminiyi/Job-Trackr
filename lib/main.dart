@@ -1,20 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:job_trackr/presentation/pages/job_applications_page.dart';
-import 'package:sqflite/sqflite_dev.dart';
-import 'data/providers/job_application_provider.dart';
-
-late JobApplicationProvider jobApplicationProvider;
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:job_trackr/presentation/screens/job_applications_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final dbFactory = sqfliteDatabaseFactoryDefault;
+  runApp(JobTrackr());
+}
 
-  jobApplicationProvider = JobApplicationProvider(dbFactory);
-  await jobApplicationProvider.init();
+class JobTrackr extends StatelessWidget {
+  JobTrackr({super.key});
 
-  runApp(const MaterialApp(
-    title: 'Navigation Basics',
-    home: JobApplicationsPage(),
-  ));
+  @override
+  Widget build(BuildContext context) {
+    return ProviderScope(
+      child: MaterialApp(
+        title: 'Job Trackr',
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: const [
+          Locale('en'),
+          Locale('fr'),
+        ],
+        theme: ThemeData(
+          primarySwatch: Colors.amber,
+          typography: Typography.material2018(),
+        ),
+        home: JobApplicationsPage(),
+      ),
+    );
+  }
 }

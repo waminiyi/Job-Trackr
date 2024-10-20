@@ -1,3 +1,4 @@
+/*
 import 'dart:async';
 import 'dart:collection';
 
@@ -253,6 +254,7 @@ class JobApplicationProvider {
           columnEnterpriseName,
           columnApplicationDate,
           columnStatus,
+          columnLocationName
         ],
         orderBy:
             '$columnEnterpriseName ${(descending ?? false) ? 'ASC' : 'DESC'}',
@@ -274,3 +276,4 @@ class JobApplicationProvider {
     await dbFactory.deleteDatabase(await fixPath(databaseName));
   }
 }
+*/

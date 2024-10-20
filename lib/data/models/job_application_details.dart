@@ -1,3 +1,4 @@
+/*
 import 'dart:convert';
 
 import 'package:json_annotation/json_annotation.dart';
@@ -85,7 +86,8 @@ class JobApplicationDetails {
   Map<String, dynamic> toMap() => _$JobApplicationToJson(this);
 
   // Convert the JobApplication object into a map for database storage
-  /*Map<String, Object?> toMap() {
+  */
+/*Map<String, Object?> toMap() {
     var map = <String, Object?>{
       columnTitle: title,
       columnEnterpriseName: enterpriseName,
@@ -103,14 +105,17 @@ class JobApplicationDetails {
       map[columnId] = id;
     }
     return map;
-  }*/
+  }*//*
+
 
   // Helper function to convert statusDates map to savable format
-  /*Map<String, String> _statusDatesToMap() {
+  */
+/*Map<String, String> _statusDatesToMap() {
     return statusDates.map((status, date) =>
         MapEntry(status.index.toString(), date.toIso8601String()));
   }
-*/
+*//*
+
   // Helper function to parse status dates from a map
   Map<ApplicationStatus, DateTime> _mapToStatusDates(Map<String, Object?> map) {
     return map.map((statusIndex, date) => MapEntry(
@@ -119,6 +124,7 @@ class JobApplicationDetails {
   }
 
 // Create a JobApplication object from a map (retrieved from the database)
+*/
 /*  JobApplication.fromMap(Map<String, Object?> map) {
     id = map[columnId] as int?;
     title = map[columnTitle] as String;
@@ -141,5 +147,7 @@ class JobApplicationDetails {
     enterpriseLink = map[columnEnterpriseLink] as String?;
     locationName = map[columnLocationName] as String?;
     note = map[columnNote] as String?;
-  }*/
+  }*//*
+
 }
+*/
