@@ -1,8 +1,14 @@
 import 'dart:convert';
 import 'package:drift/drift.dart';
 
+import '../data/models/application_status.dart';
+import '../data/models/job_application_details.dart';
+import '../data/models/job_type.dart';
+import '../data/models/opportunity_type.dart';
+import '../data/models/work_flexibility.dart';
 
-@DataClassName('ApplicationDetails')
+
+@UseRowClass(ApplicationDetails)
 class ApplicationEntries extends Table with AutoIncrementingPrimaryKey {
   TextColumn get company => text()();
 
@@ -118,45 +124,4 @@ class StatusEventConverter extends TypeConverter<Set<StatusEvent>, String> {
   }
 }
 
-enum ApplicationStatus {
-  applied,
-  reviewed,
-  hrInterviewing,
-  technicalInterviewing,
-  waitingForInterviewFeedback,
-  technicalTest,
-  accepted,
-  ghosting,
-  rejected,
-  offer,
-}
 
-enum JobType {
-  fullTime,
-  partTime,
-  internship,
-  contract,
-  apprenticeship,
-  temporary,
-  freelance,
-  other,
-}
-
-enum OpportunityType {
-  jobPost,
-  referral,
-  offer,
-  apply,
-  networking,
-  internalTransfer,
-  walkIn,
-  other,
-}
-
-enum WorkFlexibility {
-  fullRemote,
-  onSite,
-  hybrid,
-  negotiable,
-  other,
-}

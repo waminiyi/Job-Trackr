@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:job_trackr/database/table.dart';
+import '../data/models/application_status.dart';
 
 extension ApplicationStatusLocalization on ApplicationStatus {
   String localized(BuildContext context) {
@@ -24,6 +24,8 @@ extension ApplicationStatusLocalization on ApplicationStatus {
       case ApplicationStatus.waitingForInterviewFeedback:
       case ApplicationStatus.offer:
       return AppLocalizations.of(context)!.applicationStatus_offer;
+      case ApplicationStatus.planned:
+        return AppLocalizations.of(context)!.applicationStatus_planned;
 
     }
   }

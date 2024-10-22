@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:job_trackr/presentation/screens/job_application_form.dart';
 import 'package:job_trackr/presentation/screens/job_application_cart.dart';
 import 'package:job_trackr/presentation/screens/state.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import 'add_edit_application/add_edit_application.dart';
 
 class JobApplicationsPage extends ConsumerStatefulWidget {
   const JobApplicationsPage({super.key});
@@ -50,7 +51,7 @@ class _JobApplicationsPageState extends ConsumerState<JobApplicationsPage> {
         onPressed: () {
           Navigator.of(context)
               .push<void>(MaterialPageRoute(builder: (context) {
-            return const JobApplicationForm();
+            return const JobApplicationForm(null);
           }));
         },
         child: const Icon(Icons.add),

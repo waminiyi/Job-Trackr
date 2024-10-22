@@ -1,9 +1,13 @@
 enum ApplicationStatus {
   planned,
-  sent,
-  viewed,
+  applied,
+  reviewed,
+  hrInterviewing,
+  technicalInterviewing,
   waitingForInterviewFeedback,
-  proposition,
-  refused,
+  technicalTest,
   accepted,
+  ghosting,
+  rejected,
+  offer,
 }

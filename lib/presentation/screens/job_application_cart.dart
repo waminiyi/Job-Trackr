@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:job_trackr/data/models/application_status.dart';
 import 'package:job_trackr/presentation/application_status_localization.dart';
 
+import '../../data/models/application_status.dart';
 import '../../data/models/job_application.dart';
 
 final DateFormat _format = DateFormat.yMMMd();
@@ -67,7 +67,7 @@ class JobApplicationCard extends StatelessWidget {
                           width: 12.0,
                           height: 12.0,
                           decoration: BoxDecoration(
-                            color: application.status == ApplicationStatus.sent
+                            color: application.status == ApplicationStatus.applied
                                 ? Colors.blue
                                 : Colors.purple,
                             shape: BoxShape.circle,

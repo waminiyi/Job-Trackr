@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:job_trackr/data/models/application_status.dart';
-import 'package:job_trackr/data/models/application_type.dart';
+import 'package:job_trackr/data/models/opportunity_type.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:synchronized/synchronized.dart';
 
