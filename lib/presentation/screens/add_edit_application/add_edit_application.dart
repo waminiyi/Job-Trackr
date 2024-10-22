@@ -73,13 +73,21 @@ class JobApplicationFormState extends ConsumerState<JobApplicationForm> {
             ApplicationEntriesCompanion.insert(
               role: _role,
               company: _company,
-              applicationDate: drift.Value(_applicationDate),
+              applicationDate: _applicationDate != null
+                  ? drift.Value(_applicationDate)
+                  : const drift.Value.absent(),
               opportunity: drift.Value(_opportunityType),
               status: _status!,
-              location: drift.Value(_location),
-              jobPostUrl: drift.Value(_jobPostUrl),
+              location: (_location != null && _location!.isNotEmpty)
+                  ? drift.Value(_location!)
+                  : const drift.Value.absent(),
+              jobPostUrl: (_jobPostUrl != null && _jobPostUrl!.isNotEmpty)
+                  ? drift.Value(_jobPostUrl!)
+                  : const drift.Value.absent(),
               flexibility: drift.Value(_flexibility),
-              note: drift.Value(_note),
+              note: (_note != null && _note!.isNotEmpty)
+                  ? drift.Value(_note!)
+                  : const drift.Value.absent(),
             ),
           );
 
@@ -92,6 +100,9 @@ class JobApplicationFormState extends ConsumerState<JobApplicationForm> {
 
   @override
   Widget build(BuildContext context) {
+    final DateFormat localizedDateFormat =
+        DateFormat.yMMMMd(Localizations.localeOf(context).toString());
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.initialApplication != null
@@ -162,7 +173,7 @@ class JobApplicationFormState extends ConsumerState<JobApplicationForm> {
                   readOnly: true,
                   controller: TextEditingController(
                     text: _applicationDate != null
-                        ? DateFormat.yMMMd().format(_applicationDate!)
+                        ? localizedDateFormat.format(_applicationDate!)
                         : '',
                   ),
                   onTap: () => _pickDate(context),

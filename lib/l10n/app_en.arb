@@ -19,6 +19,16 @@
   "save": "Save",
   "cancel": "Cancel",
   "pleaseEnter": "Please enter: ",
+  "appliedOn": "Applied on {applicationDate}",
+  "@appliedOn": {
+    "placeholders": {
+      "applicationDate": {
+        "type": "String"
+      }
+    }
+  },
+  "locationNotSpecified": "Location not specified",
+  "applicationPlanned": "Application planned",
   "applicationStatus_applied": "Applied",
   "applicationStatus_reviewed": "Reviewed",
   "applicationStatus_hrInterviewing": "HR interviewing",

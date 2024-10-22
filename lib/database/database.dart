@@ -89,11 +89,12 @@ class AppDatabase extends _$AppDatabase {
     return (select(applicationEntries)
         .map((entry) => JobApplication(
             id: entry.id,
-            title: entry.role,
-            enterpriseName: entry.company,
-            applicationDate: entry.applicationDate ?? DateTime.now(),
+            role: entry.role,
+            company: entry.company,
+            applicationDate: entry.applicationDate,
             status: entry.status,
-            location: entry.location ?? ''))
+            flexibility: entry.flexibility,
+            location: entry.location))
         .watch());
   }
 

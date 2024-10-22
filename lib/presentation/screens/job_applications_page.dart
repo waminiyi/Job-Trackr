@@ -24,7 +24,6 @@ class _JobApplicationsPageState extends ConsumerState<JobApplicationsPage> {
   @override
   Widget build(BuildContext context) {
     final jobApplications = ref.watch(applications);
-
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.jobApplications),
@@ -33,6 +32,13 @@ class _JobApplicationsPageState extends ConsumerState<JobApplicationsPage> {
           padding: const EdgeInsets.all(10.0),
           child: jobApplications.when(
               data: (entries) {
+                for (var application in entries) {
+                  debugPrint('Job Application: ID: ${application.id}, Role: ${application.role}, Company: ${application.company}, '
+                      'Date: ${application.applicationDate?.toIso8601String() ?? 'Not specified'}, '
+                      'Status: ${application.status}, Location: ${application.location ?? 'Not specified'}, '
+                      'Flexibility: ${application.flexibility?.name ?? 'Not specified'}');
+                }
+
                 return ListView.builder(
                   itemCount: entries.length,
                   itemBuilder: (context, index) {

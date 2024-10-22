@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:job_trackr/presentation/application_status_color.dart';
 import 'package:job_trackr/presentation/application_status_localization.dart';
+import 'package:job_trackr/presentation/work_flexibility_localization.dart';
 
 import '../../data/models/application_status.dart';
 import '../../data/models/job_application.dart';
-
-final DateFormat _format = DateFormat.yMMMd();
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class JobApplicationCard extends StatelessWidget {
   final JobApplication application;
@@ -15,6 +16,9 @@ class JobApplicationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final DateFormat localizedDateFormat =
+        DateFormat.yMMMMd(Localizations.localeOf(context).toString());
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Card(
@@ -39,10 +43,10 @@ class JobApplicationCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.apartment),
+                      const Icon(Icons.apartment),
                       const SizedBox(width: 8),
                       Text(
-                        application.enterpriseName,
+                        application.company,
                         style: const TextStyle(
                             fontSize: 24, fontWeight: FontWeight.bold),
                       )
@@ -64,21 +68,17 @@ class JobApplicationCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Container(
-                          width: 12.0,
-                          height: 12.0,
-                          decoration: BoxDecoration(
-                            color: application.status == ApplicationStatus.applied
-                                ? Colors.blue
-                                : Colors.purple,
-                            shape: BoxShape.circle,
-                          ),
+                          width: 8.0,
+                          height: 8.0,
+                          decoration: application.status
+                              .decoration,
                         ),
                         const SizedBox(width: 8),
                         // Space between the circle and text
                         Text(
                           application.status.localized(context),
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 12,
                             color: Colors.black, // Adjust color based on theme
                           ),
                         ),
@@ -92,17 +92,30 @@ class JobApplicationCard extends StatelessWidget {
               const SizedBox(height: 10),
 
               Text(
-                application.title,
+                application.role,
                 style: TextStyle(fontSize: 16),
               ),
 
               // Company name
 
               const SizedBox(height: 8),
-              Text('Greater Grenoble (hybrid)'),
+              Text(
+                '${application.location ?? AppLocalizations.of(context)!.locationNotSpecified}'
+                '${application.flexibility != null ? ' (${application.flexibility!.localizedString(context)})' : ''}',
+                style: TextStyle(color: Colors.grey[600]),
+              ),
               const SizedBox(height: 8),
 
-              Text('Applied on ${_format.format(application.applicationDate)}'),
+              Text(
+                application.applicationDate != null
+                    ? AppLocalizations.of(context)!.appliedOn(
+                        localizedDateFormat
+                            .format(application.applicationDate!))
+                    : application.status == ApplicationStatus.planned
+                        ? AppLocalizations.of(context)!.applicationPlanned
+                        : 'Unknown application date',
+                style: TextStyle(color: Colors.grey[600]),
+              ),
             ],
           ),
         ),
