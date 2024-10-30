@@ -98,6 +98,10 @@ class AppDatabase extends _$AppDatabase {
         .watch());
   }
 
+  Stream<ApplicationDetails> applicationDetails(int id) {
+    return (select(applicationEntries)..where((t) => t.id.equals(id))).watchSingle();
+  }
+
   static final StateProvider<AppDatabase> provider = StateProvider((ref) {
     final database = AppDatabase();
     ref.onDispose(database.close);

@@ -26,24 +26,26 @@ class _JobApplicationsPageState extends ConsumerState<JobApplicationsPage> {
     final jobApplications = ref.watch(applications);
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(AppLocalizations.of(context)!.jobApplications),
       ),
       body: Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
           child: jobApplications.when(
               data: (entries) {
-                for (var application in entries) {
-                  debugPrint('Job Application: ID: ${application.id}, Role: ${application.role}, Company: ${application.company}, '
-                      'Date: ${application.applicationDate?.toIso8601String() ?? 'Not specified'}, '
-                      'Status: ${application.status}, Location: ${application.location ?? 'Not specified'}, '
-                      'Flexibility: ${application.flexibility?.name ?? 'Not specified'}');
-                }
-
-                return ListView.builder(
-                  itemCount: entries.length,
-                  itemBuilder: (context, index) {
-                    return JobApplicationCard(application: entries[index]);
-                  },
+                return Column(
+                  children: [
+                    const Divider(thickness: 1),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: entries.length,
+                        itemBuilder: (context, index) {
+                          return JobApplicationCard(
+                              application: entries[index]);
+                        },
+                      ),
+                    ),
+                  ],
                 );
               },
               error: (e, s) {
