@@ -19,7 +19,7 @@
   "save": "Enregistrer",
   "cancel": "Annuler",
   "pleaseEnter": "Merci d'ajouter: ",
-  "appliedOn": "Candidature envoyée le {applicationDate}",
+  "appliedOn": "Envoyée le {applicationDate}",
   "@appliedOn": {
     "placeholders": {
       "applicationDate": {

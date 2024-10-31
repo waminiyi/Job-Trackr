@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:job_trackr/data/models/application_status.dart';
 import 'package:job_trackr/data/models/job_application_details.dart';
 import 'package:job_trackr/data/models/work_flexibility.dart';
+import 'package:job_trackr/database/table.dart';
 import 'package:job_trackr/presentation/application_status_color.dart';
 import 'package:job_trackr/presentation/application_status_localization.dart';
 import 'package:job_trackr/presentation/work_flexibility_localization.dart';
@@ -22,14 +24,23 @@ class ApplicationDetailsScreen extends ConsumerStatefulWidget {
 }
 
 class _ApplicationDetailsScreenState
-    extends ConsumerState<ApplicationDetailsScreen> {
+    extends ConsumerState<ApplicationDetailsScreen>
+    with TickerProviderStateMixin {
+  late final TabController _tabController;
   ApplicationDetails? applicationDetails;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 6, vsync: this);
     fetchApplicationDetails();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> fetchApplicationDetails() async {
@@ -94,13 +105,14 @@ class _ApplicationDetailsScreenState
 
                   return FlexibleSpaceBar(
                     title: AnimatedOpacity(
-                      duration: Duration(milliseconds: 200),
+                      duration: const Duration(milliseconds: 200),
                       opacity: isCollapsed ? 1.0 : 0.0,
                       child: Padding(
                         padding: const EdgeInsets.only(right: 16.0),
                         child: Text(
-                          'Développeur Mobile Android H/F',
-                          style: TextStyle(fontSize: 14.0, color: Colors.white),
+                          applicationDetails.role,
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -109,7 +121,6 @@ class _ApplicationDetailsScreenState
                       children: [
                         Image.asset(
                           'images/details_header_image.jpg',
-                          // Replace with your image path
                           fit: BoxFit.cover,
                         ),
                         Container(
@@ -117,185 +128,97 @@ class _ApplicationDetailsScreenState
                             gradient: LinearGradient(
                               colors: [
                                 Colors.black.withOpacity(0.6),
-                                Colors.black.withOpacity(0.1),
+                                Colors.black.withOpacity(0.2),
                               ],
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                             ),
                           ),
                         ),
-                        Positioned(
-                            bottom: 8.0,
-                            right: 4.0,
-                            child: _status(applicationDetails.status))
                       ],
                     ),
                   );
                 },
               ),
             ),
-            // Rest of the body content goes here
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Positioned(
-                      bottom: 16.0,
-                      left: 16.0,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Développeur Mobile Android H/F',
-                            // This only shows when expanded
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          applicationDetails.role,
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Text(
+                              applicationDetails.company,
+                              style: const TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
                             ),
-                          ),
-                          SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Text(
-                                'United Solutions',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                '• Lyon - 69',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                '• CDI',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white.withOpacity(0.8),
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 4, horizontal: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.blue[100]?.withOpacity(0.8),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              '38 000 - 47 000 € / an',
+                            const SizedBox(width: 4),
+                            _locationAndFlexibility(applicationDetails.location,
+                                applicationDetails.flexibility),
+                            const SizedBox(width: 10),
+                            Text(
+                              '• CDI',
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.blue[900],
+                                color: Colors.white.withOpacity(0.8),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        _applicationDate(applicationDetails.applicationDate),
+                        const SizedBox(height: 8),
+                        _salaryRange(applicationDetails.salaryRange),
+                        const SizedBox(height: 20),
+                        _applicationStatus(applicationDetails.status),
+                        const SizedBox(height: 20),
+                      ],
                     ),
-
-                    DropdownButton<ApplicationStatus>(
-                      value: applicationDetails.status,
-                      underline: SizedBox(),
-                      isExpanded: true,
-                      items: ApplicationStatus.values.map((status) {
-                        return DropdownMenuItem(
-                          value: status,
-                          child: _status(status),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          // Handle change and update the application status
-                          //if (value != null) {
-                          //   applicationDetails = applicationDetails.copyWith(status: value);
-                          //}
-                        });
-                      },
-                      hint: Text(AppLocalizations.of(context)!.applicationStatus),
-
-                    ),
-
-                    // Progress indicator
-                    Divider(height: 40),
+                    const Divider(thickness: 1),
+                    const SizedBox(height: 10),
                     _actionTabBar(),
-                    // Question Section
-                    Container(
-                      padding: EdgeInsets.all(12),
-                      color: Colors.purple[50],
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Avez-vous eu un retour du recruteur ?",
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w600),
-                          ),
-                          SizedBox(height: 10),
-                          RadioListTile(
-                            value: 1,
-                            groupValue: 0,
-                            onChanged: (value) {},
-                            title: Text("Oui, je suis recruté"),
-                          ),
-                          RadioListTile(
-                            value: 2,
-                            groupValue: 0,
-                            onChanged: (value) {},
-                            title: Text(
-                                "Ma candidature n'a pas été retenue / Je n'ai pas donné suite"),
-                          ),
-                          RadioListTile(
-                            value: 3,
-                            groupValue: 0,
-                            onChanged: (value) {},
-                            title: Text("Non, pas encore"),
-                          ),
-                        ],
-                      ),
-                    ),
+                    const SizedBox(height: 10),
                   ],
                 ),
               ),
             ),
+            SliverFillRemaining(
+              child: TabBarView(
+                controller: _tabController,
+                children: const <Widget>[
+                  Center(
+                    child: Text("Infos here"),
+                  ),
+                  Center(
+                    child: Text("History here"),
+                  ),
+                  Center(
+                    child: Text("Notes here"),
+                  ),
+                  Center(
+                    child: Text("Contacts here"),
+                  ),
+                  Center(
+                    child: Text("Interviews here"),
+                  ),
+                  Center(
+                    child: Text("Follow-up here"),
+                  ),
+                ],
+              ),
+            )
           ]);
-          /*return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(
-                    applicationDetails.role,
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(
-                    applicationDetails.company,
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                _locationAndFlexibility(applicationDetails.location,
-                    applicationDetails.flexibility),
-                _salaryRange(),
-                _applicationStatus(applicationDetails.status),
-                _actionTabBar()
-              ],
-            ),
-          );*/
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
@@ -305,123 +228,146 @@ class _ApplicationDetailsScreenState
 
   Widget _locationAndFlexibility(
       String? location, WorkFlexibility? flexibility) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Text(
-        '${location ?? ''}'
-        '${location != null && flexibility != null ? ' - ' : ''}'
-        '${flexibility != null ? flexibility.localizedString(context) : ''}',
-        style: TextStyle(color: Colors.grey[600]),
-      ),
+    return Text(
+      '${location ?? ''}'
+      '${location != null && flexibility != null ? ' • ' : ''}'
+      '${flexibility != null ? ' • ${flexibility.localizedString(context)}' : ''}',
+      style: TextStyle(color: Colors.grey[600]),
     );
   }
 
   Widget _applicationStatus(ApplicationStatus status) {
-    return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Status: ${status.localized(context)}',
-                style: TextStyle(fontSize: 18)),
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () {
-                // Open edit dialog to change status
-              },
-            ),
-          ],
-        ));
+    return Container(
+      color: status.decoration.color,
+      child: DropdownButton<ApplicationStatus>(
+        value: status,
+        underline: const SizedBox(),
+        isExpanded: true,
+        icon: const Icon(
+          Icons.arrow_drop_down,
+          color: Colors.white,
+        ),
+        items: ApplicationStatus.values.map((status) {
+          return DropdownMenuItem(
+            value: status,
+            child: _status(status),
+          );
+        }).toList(),
+        onChanged: (value) {
+          setState(() {
+            // Handle change and update the application status
+            //if (value != null) {
+            //   applicationDetails = applicationDetails.copyWith(status: value);
+            //}
+          });
+        },
+        hint: Text(
+          AppLocalizations.of(context)!.applicationStatus,
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+    );
   }
 
-  Widget _salaryRange() {
-    return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 4.0),
-        child: Text('35000 - 40000'));
+  Widget _salaryRange(SalaryRange? salaryRange) {
+    return salaryRange != null
+        ? Container(
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+            decoration: BoxDecoration(
+              color: Colors.blue[100]?.withOpacity(0.8),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '38 000 - 47 000 € / an',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.blue[900],
+              ),
+            ),
+          )
+        : InkWell(
+            onTap: () {},
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.add,
+                    color: Colors.blue,
+                  ),
+                  SizedBox(width: 4),
+                  Text(
+                    'Add salary range',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.blue,
+                    ),
+                  )
+                ],
+              ),
+            ));
+  }
+
+  Widget _applicationDate(DateTime? applicationDate) {
+    final DateFormat localizedDateFormat =
+        DateFormat.yMMMMd(Localizations.localeOf(context).toString());
+    return Text(
+      applicationDate != null
+          ? AppLocalizations.of(context)!
+              .appliedOn(localizedDateFormat.format(applicationDate))
+          : "",
+      style: TextStyle(
+        color: Colors.grey[600],
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
   }
 
   Widget _actionTabBar() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        IconButton(
-          icon: const Icon(Icons.info),
-          onPressed: () {
-            // Handle information action
-          },
+    return TabBar(
+      controller: _tabController,
+      tabs: const <Widget>[
+        Tab(
+          icon: Icon(Icons.info_outline),
         ),
-        IconButton(
-          icon: Icon(Icons.history),
-          onPressed: () {
-            // Handle lightbulb action
-          },
+        Tab(
+          icon: Icon(Icons.history_outlined),
         ),
-        IconButton(
-          icon: Icon(Icons.note),
-          onPressed: () {
-            // Handle attachment action
-          },
+        Tab(
+          icon: Icon(Icons.note_alt_outlined),
         ),
-        IconButton(
-          icon: Icon(Icons.calendar_today),
-          onPressed: () {
-            // Handle calendar action
-          },
+        Tab(
+          icon: Icon(Icons.contacts_outlined),
         ),
-        IconButton(
-          icon: Icon(Icons.contacts),
-          onPressed: () {
-            // Handle email action
-          },
+        Tab(
+          icon: Icon(Icons.meeting_room_outlined),
         ),
-        IconButton(
-          icon: Icon(Icons.check_circle),
-          onPressed: () {
-            // Handle completion action
-          },
-        ),
-        IconButton(
-          icon: Icon(Icons.edit),
-          onPressed: () {
-            // Handle edit action
-          },
+        Tab(
+          icon: Icon(Icons.calendar_today_outlined),
         ),
       ],
     );
   }
 
   Widget _status(ApplicationStatus status) {
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(
-            color: Colors.grey,
-            width: 1.0,
-          ),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: 20.0,
-              height: 12.0,
-              decoration: status.decoration,
-            ),
-            const SizedBox(width: 4),
-            // Space between the circle and text
-            Text(
-              status.localized(context),
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black,
-              ),
-            ),
-          ],
+    return Container(
+      width: double.infinity, // Take up the full width of the dropdown item
+
+      decoration: BoxDecoration(
+        color: status.decoration.color,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          status.localized(context),
+          style: const TextStyle(
+              fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
     );
